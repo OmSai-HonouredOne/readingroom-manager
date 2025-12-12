@@ -1,40 +1,48 @@
 {% extends "student/baseauth.html" %}
 {% block title %}Student Register{% endblock %}
 {% block content %}
-    <h3 class="text-center mb-3">Student Register</h3>
+<h3 class="text-center mb-3 auth-h3">Student Register</h3>
 
-    <form action="{{ url_for('student.register') }}" method="post">
-        <div class="mb-3">
-            <label for="name" class="form-label">Student Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="reg" class="form-label">Registration Number</label>
-            <input type="number" class="form-control" id="reg" name="regno" placeholder="Enter registration number" required pattern="\\d{8}">
-        </div>
+<form action="{{ url_for('student.register') }}" method="post">
+    <div class="mb-3">
+        <label for="name" class="form-label">Student Name</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="branch" class="form-label">Branch</label>
-            <input type="text" class="form-control" id="branch" name="branch" placeholder="Enter branch" required>
-        </div>
+    <div class="mb-3">
+        <label for="reg" class="form-label">Registration Number</label>
+        <input type="number" class="form-control" id="reg" name="regno" placeholder="Enter registration number" required
+            pattern="\\d{8}">
+    </div>
 
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
-        </div>
+    <div class="mb-3">
+        <label for="branch" class="form-label">Branch</label>
+        <input type="text" class="form-control" id="branch" name="branch" placeholder="Enter branch" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-        </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="confirm" class="form-label">Confirm Password</label>
-            <input type="password" class="form-control" id="confirm" name="cpassword" placeholder="Re-enter password" required>
-        </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+    </div>
 
-        <button type="submit" class="btn btn-green w-100 mt-2">Register</button>
-        <p class="text-center mt-3" style="color: #f5f5ff;">Already have an account? <a href="{{ url_for('student.login') }}" style="color: #60a5fa; text-decoration: underline;">Login here</a></p>
-    </form>
+    <div class="mb-3">
+        <label for="cpassword" class="form-label">Confirm Password</label>
+        <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Re-enter password"
+            required>
+    </div>
+
+    <div class="mb-3">
+        <input type="checkbox" class="form-check-input" id="showPassword" onclick="togglePassword()">
+        <label for="showPassword" class="form-label">Show Password</label>
+    </div>
+
+    <button type="submit" class="btn btn-green w-100 mt-2">Register</button>
+    <p class="text-center mt-3" style="color: #f5f5ff;">Already have an account? <a
+            href="{{ url_for('student.login') }}" style="color: #60a5fa; text-decoration: underline;">Login here</a></p>
+</form>
 {% endblock %}
