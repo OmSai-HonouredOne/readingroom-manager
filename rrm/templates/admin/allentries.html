@@ -1,0 +1,61 @@
+{% extends "admin/baseadmin.html" %}
+
+{% block title %}
+All Entries
+{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="card p-4">
+        <h3 class="text-center mb-4" style="color:#60a5fa;">Entries for {{ entry_date }}</h3>
+        <div class="justify-content-between mb-3 d-flex">
+            {% if page > 1 %}
+            <a href="{{ url_for('admin.entries', page=page-1) }}" class="btn btn-primary">Next</a>
+            {% else %}
+            <span></span>
+            {% endif %}
+
+            {% if page < total_pages %}
+            <a href="{{ url_for('admin.entries', page=page+1) }}" class="btn btn-primary">Previous</a>
+            {% else %}
+            <span></span>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-bordered table-hover text-center align-middle">
+                <thead style="background-color:#1e293b;">
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Registration Number</th>
+                        <th>Name</th>
+                        <th>Branch</th>
+                        <th>In Time</th>
+                        <th>Out Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in entries %}
+                    <tr>
+                        <td>{{ e.session_id }}</td>
+                        <td>{{ e.regno }}</td>
+                        <td>{{ e.name }}</td>
+                        <td>{{ e.branch }}</td>
+                        <td>{{ e.in_time_formatted }}</td>
+                        <td>
+                            {% if e.out_time_formatted %}
+                            {{ e.out_time_formatted }}
+                            {% else %}
+                            <span style="color:#facc15;">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

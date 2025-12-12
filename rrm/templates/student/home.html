@@ -1,0 +1,19 @@
+{% extends 'student/base.html' %}
+{% block title %}Student Home{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+        <div class="col-12 col-md-6">
+            <div class="card p-4 text-center">
+                <h4>Seats Occupied</h4>
+                <h2>{{ n_occupied }} / {{ total }}</h2>
+                {% if student.is_admin %}
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-blue mt-3">See More</a>
+                {% else %}
+                <a href="{{ url_for('student.profile') }}" class="btn btn-blue mt-3">See More</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

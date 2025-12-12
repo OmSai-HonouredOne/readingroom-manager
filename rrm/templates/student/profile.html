@@ -1,0 +1,22 @@
+{% extends 'student/base.html' %}
+{% block title %}Student Profile{% endblock %}
+{% block content %}
+    <div class="container py-5 d-flex justify-content-center">
+        <div class="card p-4 shadow-lg w-100" style="max-width: 500px;">
+            <div class="card-header text-center">Student Profile</div>
+            <div class="card-body text-center">
+                <p><label>Name:</label> {{ student.name }}</p>
+                <p><label>Registration Number:</label> {{ student.regno }}</p>
+                <p><label>Branch:</label> {{ student.branch }}</p>
+                <p><label>Occupancy:</label> {{ n_occupied }} / {{ total }}</p>
+                {% if student.is_checkedin %}
+                <p><label>Status:</label> Checked In ✅</p>
+                {% else %}
+                <p><label>Status:</label> Not Checked In ❌</p>
+                {% endif %}
+                <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ student.regno }}" alt="Student QR Code">
+                <button class="btn btn-edit w-100 mt-3" onclick="window.location.href='{{ url_for('student.editprofile', regno=student.regno) }}'">Edit Profile</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

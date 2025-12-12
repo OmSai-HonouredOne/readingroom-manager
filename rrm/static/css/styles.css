@@ -1,0 +1,129 @@
+body {
+    background-color: #0a0a0e;
+    color: #ffffff;
+}
+
+.navbar {
+    background-color: #11131a;
+}
+
+.navbar-brand, .nav-link {
+    color: #60a5fa !important;
+}
+
+.nav-link:hover {
+    color: #2563eb !important;
+}
+
+.navbar-toggler {
+    border-color: none;
+}
+
+.navbar-toggler-icon {
+    background-image: none;
+    width: 30px;
+    height: 22px;
+    position: relative;
+}
+
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after,
+.navbar-toggler-icon div {
+    content: '';
+    background-color: #60a5fa;
+    height: 4px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.navbar-toggler-icon::before {
+    top: 0;
+}
+
+.navbar-toggler-icon div {
+    top: 9px;
+}
+
+.navbar-toggler-icon::after {
+    bottom: 0;
+}
+
+.card {
+    background-color: #11131a;
+    border: 1px solid #3b82f6;
+    border-radius: 12px;
+    color: azure !important;
+}
+
+.card-header {
+    background-color: #1e293b;
+    color: #60a5fa;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.card-body label,
+.card-body p {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.btn-edit {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #1d4ed8;
+}
+
+.qr-code {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #f5f5ff;
+}
+
+.form-control {
+    background-color: #111827;
+    border: 1px solid #1f2937;
+    color: white;
+}
+
+.form-control:focus {
+    background-color: #111827;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.4);
+}
+
+.btn-blue {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-blue:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.scanner-box {
+    width: 100%;
+    max-width: 400px;
+    height: 250px;
+    margin: 20px auto;
+    background-color: #1e293b;
+    border: 2px dashed #3b82f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #60a5fa;
+    font-weight: 500;
+    text-align: center;
+}
