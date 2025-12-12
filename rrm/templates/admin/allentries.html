@@ -27,6 +27,7 @@ All Entries
                 <thead style="background-color:#1e293b;">
                     <tr>
                         <th>Session ID</th>
+                        <th>Box No.</th>
                         <th>Registration Number</th>
                         <th>Name</th>
                         <th>Branch</th>
@@ -38,6 +39,7 @@ All Entries
                     {% for e in entries %}
                     <tr>
                         <td>{{ e.session_id }}</td>
+                        <td>{{ e.box_no }}</td>
                         <td>{{ e.regno }}</td>
                         <td>{{ e.name }}</td>
                         <td>{{ e.branch }}</td>

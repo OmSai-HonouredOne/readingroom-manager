@@ -43,7 +43,7 @@ def admin_required(view):
 @bp.route('/')
 def home():
     n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = 50  # hardcoded total rooms
+    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
     return render_template('student/home.html', student=g.user, n_occupied=n_occupied['count'], total=total)
 
 
@@ -122,8 +122,28 @@ def logout():
 @login_required
 def profile():
     n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = 50  # hardcoded total rooms
+    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
     return render_template('student/profile.html', student=g.user, n_occupied=n_occupied['count'], total=total)
+
+
+@bp.route('/profile/<int:regno>/toggle_laptop')
+@login_required
+def toggle_laptop(regno):
+    if g.user['regno'] != regno:
+        flash("You are not authorized to edit this profile.", 'danger')
+        return redirect(url_for('student.profile'))
+
+    current_status = g.user['is_laptop']
+    new_status = not current_status
+
+    execute(
+        'UPDATE students SET is_laptop = %s WHERE regno = %s',
+        (new_status, regno)
+    )
+
+    flash("Laptop status updated successfully.", 'success')
+    return redirect(url_for('student.profile'))
+
 
 @bp.route('/edit/<int:regno>', methods=('GET', 'POST'))
 @login_required
