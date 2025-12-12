@@ -77,7 +77,7 @@ def register():
                 )
                 return redirect(url_for('student.login'))
 
-            flash(error)
+            flash(error, 'danger')
 
         return render_template('student/register.html')
 
@@ -107,7 +107,7 @@ def login():
                 else:
                     return redirect(url_for('student.profile'))
             
-            flash(error)
+            flash(error, 'danger')
 
     return render_template('student/login.html')
 
@@ -129,7 +129,7 @@ def profile():
 @login_required
 def editprofile(regno):
     if g.user['regno'] != regno:
-        flash("You are not authorized to edit this profile.")
+        flash("You are not authorized to edit this profile.", 'danger')
         print(g.user['regno'], regno)
         return redirect(url_for('student.profile'))
 
@@ -162,6 +162,6 @@ def editprofile(regno):
                 )
             return redirect(url_for('student.profile'))
 
-        flash(error)
+        flash(error, 'danger')
 
     return render_template('student/editprofile.html', student=g.user)
