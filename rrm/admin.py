@@ -63,13 +63,14 @@ def checkin():
 @bp.route('/entries/<int:page>')
 @admin_required
 def entries(page):
-    dates = query_all("SELECT DISTINCT DATE(in_time AT TIME ZONE 'Asia/Kolkata') AS in_time FROM entries ORDER BY in_time DESC")
+    dates = query_all("SELECT DISTINCT in_time::date AS in_time FROM entries ORDER BY in_time DESC")
+    print(dates)
     if page < 1 or page > len(dates):
         flash('Invalid page number.', 'danger')
         return redirect(url_for('admin.entries', page=1))
     entry_date = dates[page - 1]['in_time']
 
-    entries = query_all("SELECT session_id, regno, box_no, name, branch, to_char(in_time, 'HH12:MI AM') AS in_time_formatted, to_char(out_time, 'HH12:MI AM') AS out_time_formatted FROM entries WHERE DATE(in_time AT TIME ZONE 'Asia/Kolkata') = %s ORDER BY in_time DESC", (entry_date,))
+    entries = query_all("SELECT session_id, regno, box_no, name, branch, to_char(in_time, 'HH12:MI AM') AS in_time_formatted, to_char(out_time, 'HH12:MI AM') AS out_time_formatted FROM entries WHERE in_time::date = %s ORDER BY in_time DESC", (entry_date,))
     return render_template('admin/allentries.html', entries=entries, entry_date=entry_date, page=page, total_pages=len(dates))
 
 @bp.route('/box_status')
