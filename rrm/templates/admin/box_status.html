@@ -16,6 +16,7 @@ Box Status
                         <th>Is Laptop</th>
                         <th>Reg. No</th>
                         <th>Name</th>
+                        <th>#</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,6 +36,16 @@ Box Status
                             {{ box.name }}
                             {% else %}
                             <span style="color:#22c55e;">Available</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if box.regno %}
+                            <form action="{{ url_for('admin.checkin') }}" method="post">
+                                <input type="hidden" name="regno" value="{{ box.regno }}">
+                                <button type="submit" class="btn btn-sm btn-primary">Kick Out</button> 
+                            </form>
+                            {% else %}
+                            <span style="color: #22c55e;">Available</span>
                             {% endif %}
                         </td>
                     </tr>

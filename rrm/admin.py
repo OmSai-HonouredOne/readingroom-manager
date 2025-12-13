@@ -13,10 +13,11 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('/')
 @admin_required
 def dashboard():
-    # in students table there is a boolean column "is_checkedin"
-    n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
-    return render_template('admin/dashboard.html', n_occupied=n_occupied['count'], total=total)
+    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
+    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
+    total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
+    total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
+    return render_template('admin/dashboard.html', laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
 
 
 @bp.route('/checkin', methods=['POST'])

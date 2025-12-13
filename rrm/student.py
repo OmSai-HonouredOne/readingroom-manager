@@ -42,9 +42,11 @@ def admin_required(view):
 
 @bp.route('/')
 def home():
-    n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
-    return render_template('student/home.html', student=g.user, n_occupied=n_occupied['count'], total=total)
+    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
+    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
+    total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
+    total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
+    return render_template('student/home.html', student=g.user, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
 
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -121,9 +123,11 @@ def logout():
 @bp.route('/profile')
 @login_required
 def profile():
-    n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
-    return render_template('student/profile.html', student=g.user, n_occupied=n_occupied['count'], total=total)
+    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
+    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
+    total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
+    total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
+    return render_template('student/profile.html', student=g.user, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
 
 
 @bp.route('/profile/<int:regno>/toggle_laptop')

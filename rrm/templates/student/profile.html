@@ -8,7 +8,11 @@
             <p><label>Name:</label> {{ student.name }}</p>
             <p><label>Registration Number:</label> {{ student.regno }}</p>
             <p><label>Branch:</label> {{ student.branch }}</p>
-            <p><label>Occupancy:</label> {{ n_occupied }} / {{ total }}</p>
+            <p>
+                <label>Laptop Seats Occupied: {{ laptop_occupied }}/{{ total_laptop }}</label>
+                <br>
+                <label>Non-Laptop Seats Occupied: {{ non_laptop_occupied }}/{{ total_non_laptop }}</label>
+            </p>
             <p><label>Laptop:</label> {% if student.is_laptop %}Yes{% else %}No{% endif %}</p>
             {% if student.is_checkedin %}
             <p><label>Status:</label> Checked In ✅(Box Number: {{ student.box_no }})</p>
