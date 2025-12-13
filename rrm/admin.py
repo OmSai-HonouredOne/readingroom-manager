@@ -43,11 +43,11 @@ def checkin():
     
     else:
         if student['is_laptop']:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL')
+            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL ORDER BY box_no ASC')
             if box is None:
                 box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
         else:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno IS NULL')
+            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno IS NULL ORDER BY box_no ASC')
             if box is None:
                 box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
         

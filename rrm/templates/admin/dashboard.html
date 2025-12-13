@@ -25,9 +25,9 @@
                     <button class="btn btn-blue mt-2" onclick="switchCamera()">Switch Camera</button>
                 </div>
                 <hr style="border-color: #3b82f6; margin: 20px 0;">
-                <form action="/admin/checkin" method="post">
+                <form action="{{ url_for('admin.checkin') }}" method="post">
                     <div class="mb-2">
-                        <input type="text" class="form-control" id="manualRegno" name="manual_regno" placeholder="Enter Registration Number">
+                        <input type="text" class="form-control" id="manualRegno" name="manual_regno" placeholder="Enter Registration Number" required>
                     </div>
                     <button type="submit" class="btn btn-blue w-100">Check In/Out Manually</button>
                 </form>
