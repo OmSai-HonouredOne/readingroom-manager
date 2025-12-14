@@ -2,6 +2,7 @@ from flask import (
     Blueprint, render_template, request, redirect, url_for, flash, g
 )
 from werkzeug.exceptions import abort
+from datetime import datetime, timedelta
 
 from rrm.student import login_required, admin_required
 from rrm.db import query_all, query_one, execute
@@ -17,7 +18,8 @@ def dashboard():
     non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
     total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
     total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
-    return render_template('admin/dashboard.html', laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
+    return render_template('admin/dashboard.html', current_date=datetime.now().date(), laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
+
 
 
 @bp.route('/checkin', methods=['POST'])
@@ -60,21 +62,21 @@ def checkin():
     return redirect(url_for('admin.dashboard'))
 
 
-@bp.route('/entries/<int:page>')
+@bp.route('/entries/<string:date>', methods=['GET', 'POST'])
 @admin_required
-def entries(page):
-    dates = query_all("SELECT DISTINCT in_time::date AS in_time FROM entries ORDER BY in_time DESC")
-    print(dates)
-    if page < 1 or page > len(dates):
-        flash('Invalid page number.', 'danger')
-        return redirect(url_for('admin.entries', page=1))
-    entry_date = dates[page - 1]['in_time']
-
+def entries(date):
+    if request.method == 'POST':
+        entry_date = request.form.get('entry_date')
+        return redirect(url_for('admin.entries', date=entry_date))
+    # date will be a string in yyyy-mm-dd format
+    entry_date = datetime.strptime(date, '%Y-%m-%d').date()
+    previous_date = entry_date - timedelta(days=1)
+    next_date = entry_date + timedelta(days=1)
     entries = query_all("SELECT session_id, regno, box_no, name, branch, to_char(in_time, 'HH12:MI AM') AS in_time_formatted, to_char(out_time, 'HH12:MI AM') AS out_time_formatted FROM entries WHERE in_time::date = %s ORDER BY in_time DESC", (entry_date,))
-    return render_template('admin/allentries.html', entries=entries, entry_date=entry_date, page=page, total_pages=len(dates))
+    return render_template('admin/entries.html', current_date=datetime.now().date(), entries=entries, entry_date=entry_date, previous_date=previous_date, next_date=next_date)
 
 @bp.route('/box_status')
 @admin_required
 def box_status():
     boxes = query_all("SELECT box_no, is_laptop, regno, name FROM boxes ORDER BY box_no ASC")
-    return render_template('admin/box_status.html', boxes=boxes)
+    return render_template('admin/box_status.html', current_date=datetime.now().date(), boxes=boxes)

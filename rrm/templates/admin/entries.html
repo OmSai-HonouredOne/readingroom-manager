@@ -7,21 +7,24 @@ All Entries
 {% block body %}
 <div class="container my-5">
     <div class="card p-4">
+        <form action="{{ url_for('admin.entries', date=entry_date) }}" method="POST">
+            <div class="input-group mb-4">
+                <!-- in date showing follow ddmmyyyy format and not mmddyyyy in input-->
+                <input type="date" class="form-control" name="entry_date" value="{{ entry_date }}" required>
+                <button class="btn btn-primary" type="submit">Filter</button>
+            </div>
+        </form>
         <h3 class="text-center mb-4" style="color:#60a5fa;">Entries for {{ entry_date }}</h3>
         <div class="justify-content-between mb-3 d-flex">
-            {% if page > 1 %}
-            <a href="{{ url_for('admin.entries', page=page-1) }}" class="btn btn-primary">Next</a>
-            {% else %}
-            <span></span>
-            {% endif %}
-
-            {% if page < total_pages %}
-            <a href="{{ url_for('admin.entries', page=page+1) }}" class="btn btn-primary">Previous</a>
-            {% else %}
-            <span></span>
-            {% endif %}
+            <a href="{{ url_for('admin.entries', date=next_date) }}" class="btn btn-primary">Next</a>
+            <a href="{{ url_for('admin.entries', date=previous_date) }}" class="btn btn-primary">Previous</a>
         </div>
 
+        {% if entries|length == 0 %}
+        <div class="alert alert-info text-center" role="alert">
+            No entries found for this date.
+        </div>
+        {% else %}
         <div class="table-responsive">
             <table class="table table-dark table-bordered table-hover text-center align-middle">
                 <thead style="background-color:#1e293b;">
@@ -56,6 +59,7 @@ All Entries
                 </tbody>
             </table>
         </div>
+        {% endif %}
 
     </div>
 
