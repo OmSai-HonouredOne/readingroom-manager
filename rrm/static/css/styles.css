@@ -127,4 +127,11 @@ body {
     color: #60a5fa;
     font-weight: 500;
     text-align: center;
+    overflow: hidden;
+}
+
+.result {
+    margin-top: 10px;
+    color: #60a5fa;
+    font-size: 18px;
 }

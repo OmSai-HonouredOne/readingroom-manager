@@ -16,8 +16,6 @@
             <div class="card p-4 text-center">
                 <h4>Scanner</h4>
                 <div class="scanner-box p-2" id="scanner-box">
-                    <!-- <video id="camera-preview"
-                        style="width:100%; height:100%; object-fit: cover; border-radius:8px;"></video> -->
                 </div>
 
                 <!-- Hidden field to store scanned regno -->
@@ -40,9 +38,10 @@
     </div>
 </div>
 
+<script>
+    const resultDiv = document.getElementById("result");
+    const html5QrCode = new Html5Qrcode("scanner-box");
 
-<!-- <script>
-    let html5QrCode;
     let cameras = [];
     let currentIndex = 0;
 
@@ -62,96 +61,12 @@
         form.submit();
     }
 
-    // global throttle variable
-    let lastScanTime = 0;
-
-    // Start camera by device ID (recommended way)
-    function startCameraById(cameraId) {
-        const readerBox = document.getElementById("camera-preview").parentElement;
-        readerBox.innerHTML = '<div id="reader" style="width:100%; height:100%; overflow:hidden;"></div>';
-
-        html5QrCode = new Html5Qrcode("reader");
-
-        html5QrCode.start(
-            cameraId,
-            { fps: 10, qrbox: { width: 230, height: 230 } },
-
-            function (decodedText) {
-                const now = Date.now();
-                if (now - lastScanTime < 1000) {
-                    return; // Throttle scans
-                }
-                lastScanTime = now;
-
-                console.log("Scanned:", decodedText);
-                sendScannedRegno(decodedText);
-            },
-            function (error) { }
-        );
-    }
-
-    // Load available cameras and pick REAR if available
-    function loadCameras() {
-        Html5Qrcode.getCameras().then(devices => {
-            cameras = devices;
-
-            if (!cameras.length) {
-                alert("No camera found");
-                return;
-            }
-
-            // Prefer rear camera
-            let rearIndex = 0;
-            devices.forEach((cam, index) => {
-                const label = cam.label.toLowerCase();
-                if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
-                    rearIndex = index;
-                }
-            });
-
-            currentIndex = rearIndex;
-            startCameraById(cameras[currentIndex].id);
-        });
-    }
-
-    // Stable camera switch (works on mobile + laptop)
-    function switchCamera() {
-        if (cameras.length <= 1) return;
-
-        currentIndex = (currentIndex + 1) % cameras.length;
-
-        if (html5QrCode) {
-            html5QrCode.stop().then(() => {
-                startCameraById(cameras[currentIndex].id);
-            });
-        }
-    }
-
-    // Start scanner
-    function startCamera() {
-        loadCameras();
-    }
-
-    window.onload = startCamera();
-</script> -->
-<script>
-    const resultDiv = document.getElementById("result");
-    const html5QrCode = new Html5Qrcode("scanner-box");
-
-    let cameras = [];
-    let currentIndex = 0;
-
     function onScanSuccess(decodedText) {
         resultDiv.innerText = "Scanned: " + decodedText;
 
-        // Send to Flask
-        fetch("{{ url_for('admin.checkin') }}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code: decodedText })
-        });
-
         html5QrCode.stop();
+        // redirect to checkin page
+        sendScannedRegno(decodedText);
     }
 
     function onScanFailure(error) {
