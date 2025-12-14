@@ -27,12 +27,12 @@
                     <button class="btn btn-blue mt-2" onclick="switchCamera()">Switch Camera</button>
                 </div>
                 <hr style="border-color: #3b82f6; margin: 20px 0;">
-                <form action="{{ url_for('admin.checkin') }}" method="post">
+                <form action="/admin/checkin" method="post">
                     <div class="mb-2">
                         <input type="text" class="form-control" id="manualRegno" name="manual_regno"
-                            placeholder="Enter Registration Number" required>
+                            placeholder="Enter Registration Number">
                     </div>
-                    <button type="submit" class="btn btn-blue w-100">Check In/Out Manually</button>
+                    <button type="submit" class="btn btn-blue w-100">Check In Manually</button>
                 </form>
             </div>
         </div>
@@ -40,23 +40,16 @@
 </div>
 
 
-<audio id="beepSound" preload="auto">
-    <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
-    <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.mp3" type="audio/mpeg">
-</audio>
-
-
 <script>
     let html5QrCode;
     let cameras = [];
     let currentIndex = 0;
-    let lastScanTime = 0;
 
     // Send regno to Flask
     function sendScannedRegno(regno) {
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = "{{ url_for('admin.checkin') }}";
+        form.action = "/admin/checkin";
 
         const input = document.createElement("input");
         input.type = "hidden";
@@ -68,99 +61,77 @@
         form.submit();
     }
 
-    // Start scanning with selected camera
+    // global throttle variable
+    let lastScanTime = 0;
+
+    // Start camera by device ID (recommended way)
     function startCameraById(cameraId) {
         const readerBox = document.getElementById("camera-preview").parentElement;
         readerBox.innerHTML = '<div id="reader" style="width:100%; height:100%; overflow:hidden;"></div>';
 
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("reader");
-        }
+        html5QrCode = new Html5Qrcode("reader");
 
         html5QrCode.start(
             cameraId,
-            {
-                fps: 10,
-                qrbox: { width: 260, height: 260 } // bigger scan area (better UX)
-            },
-            (decodedText) => {
+            { fps: 10, qrbox: { width: 230, height: 230 } },
+
+            function (decodedText) {
                 const now = Date.now();
-                if (now - lastScanTime < 1000) return; // 1 sec throttle
+                if (now - lastScanTime < 1000) {
+                    return; // Throttle scans
+                }
                 lastScanTime = now;
 
                 console.log("Scanned:", decodedText);
                 sendScannedRegno(decodedText);
             },
-            () => { }
+            function (error) { }
         );
     }
 
-    // Load cameras ONCE and auto-start rear
+    // Load available cameras and pick REAR if available
     function loadCameras() {
         Html5Qrcode.getCameras().then(devices => {
-            if (!devices || !devices.length) {
+            cameras = devices;
+
+            if (!cameras.length) {
                 alert("No camera found");
                 return;
             }
 
-            cameras = devices;
-
             // Prefer rear camera
-            currentIndex = 0;
+            let rearIndex = 0;
             devices.forEach((cam, index) => {
                 const label = cam.label.toLowerCase();
                 if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
-                    currentIndex = index;
+                    rearIndex = index;
                 }
             });
 
+            currentIndex = rearIndex;
             startCameraById(cameras[currentIndex].id);
         });
     }
 
-    // Switch camera (stable on mobile + laptop)
+    // Stable camera switch (works on mobile + laptop)
     function switchCamera() {
         if (cameras.length <= 1) return;
 
         currentIndex = (currentIndex + 1) % cameras.length;
 
-        html5QrCode.stop().then(() => {
-            html5QrCode.clear();
-
-            const readerBox = document.getElementById("camera-preview").parentElement;
-            readerBox.innerHTML = '<div id="reader" style="width:100%; height:100%; overflow:hidden;"></div>';
-
-            html5QrCode = new Html5Qrcode("reader");
-
-            html5QrCode.start(
-                cameras[currentIndex].id,
-                {
-                    fps: 10,
-                    qrbox: { width: 260, height: 260 }
-                },
-                (decodedText) => {
-                    const now = Date.now();
-                    if (now - lastScanTime < 1000) return;
-                    lastScanTime = now;
-                    playBeep();
-                    console.log("Scanned:", decodedText);
-                    sendScannedRegno(decodedText);
-                },
-                () => { }
-            );
-        });
-    }
-
-    function playBeep() {
-        const beep = document.getElementById("beepSound");
-        if (beep) {
-            beep.currentTime = 0;
-            beep.play().catch(() => { });
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                startCameraById(cameras[currentIndex].id);
+            });
         }
     }
 
-    // Start scanner on page load
-    window.onload = loadCameras;
+    // Start scanner
+    function startCamera() {
+        loadCameras();
+    }
+
+    window.onload = startCamera;
 </script>
 
 {% endblock %}
