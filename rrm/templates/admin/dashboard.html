@@ -41,12 +41,13 @@
 let html5QrCode;
 let cameras = [];
 let currentIndex = 0;
+let lastScanTime = 0;
 
 // Send regno to Flask
 function sendScannedRegno(regno) {
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = "/admin/checkin";
+    form.action = "{{ url_for('admin.checkin') }}";
 
     const input = document.createElement("input");
     input.type = "hidden";
@@ -58,77 +59,69 @@ function sendScannedRegno(regno) {
     form.submit();
 }
 
-// global throttle variable
-let lastScanTime = 0;
-
-// Start camera by device ID (recommended way)
+// Start scanning with selected camera
 function startCameraById(cameraId) {
     const readerBox = document.getElementById("camera-preview").parentElement;
     readerBox.innerHTML = '<div id="reader" style="width:100%; height:100%; overflow:hidden;"></div>';
 
-    html5QrCode = new Html5Qrcode("reader");
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
 
     html5QrCode.start(
         cameraId,
-        { fps: 10, qrbox: { width: 230, height: 230 } },
-
-        function(decodedText) {
+        {
+            fps: 10,
+            qrbox: { width: 260, height: 260 } // bigger scan area (better UX)
+        },
+        (decodedText) => {
             const now = Date.now();
-            if (now - lastScanTime < 1000) {
-                return; // Throttle scans
-            }
+            if (now - lastScanTime < 1000) return; // 1 sec throttle
             lastScanTime = now;
 
             console.log("Scanned:", decodedText);
             sendScannedRegno(decodedText);
         },
-        function(error) {}
+        () => {}
     );
 }
 
-// Load available cameras and pick REAR if available
+// Load cameras ONCE and auto-start rear
 function loadCameras() {
     Html5Qrcode.getCameras().then(devices => {
-        cameras = devices;
-
-        if (!cameras.length) {
+        if (!devices || !devices.length) {
             alert("No camera found");
             return;
         }
 
+        cameras = devices;
+
         // Prefer rear camera
-        let rearIndex = 0;
+        currentIndex = 0;
         devices.forEach((cam, index) => {
             const label = cam.label.toLowerCase();
             if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
-                rearIndex = index;
+                currentIndex = index;
             }
         });
 
-        currentIndex = rearIndex;
         startCameraById(cameras[currentIndex].id);
     });
 }
 
-// Stable camera switch (works on mobile + laptop)
+// Switch camera (stable on mobile + laptop)
 function switchCamera() {
     if (cameras.length <= 1) return;
 
     currentIndex = (currentIndex + 1) % cameras.length;
 
-    if (html5QrCode) {
-        html5QrCode.stop().then(() => {
-            startCameraById(cameras[currentIndex].id);
-        });
-    }
+    html5QrCode.stop().then(() => {
+        startCameraById(cameras[currentIndex].id);
+    });
 }
 
-// Start scanner
-function startCamera() {
-    loadCameras();
-}
-
-window.onload = startCamera;
+// Start scanner on page load
+window.onload = loadCameras;
 </script>
 
 {% endblock %}
