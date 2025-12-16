@@ -147,6 +147,11 @@ body {
     text-align: center;
 }
 
+@media (max-width: 768px) {
+    .layout-container {
+        padding: 4%;
+    }
+}
 .layout-h2 {
     color: #60a5fa;
     margin-bottom: 20px;
