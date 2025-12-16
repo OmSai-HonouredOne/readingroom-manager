@@ -5,7 +5,8 @@
     <div class="row g-4">
         <div class="col-12 col-md-6">
             <div class="card p-4 text-center">
-                <h2>Laptop Seats: {{ laptop_occupied }}/{{ total_laptop }} <br>Non-Laptop Seats: {{ non_laptop_occupied }}/{{ total_non_laptop }}</h2>
+                <h2>Laptop Seats: {{ laptop_occupied }}/{{ total_laptop }} <br>Non-Laptop Seats: {{ non_laptop_occupied
+                    }}/{{ total_non_laptop }}</h2>
                 {% if student.is_admin %}
                 <a href="{{ url_for('admin.dashboard') }}" class="btn btn-blue mt-3">See More</a>
                 {% else %}
@@ -14,5 +15,53 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="layout-container">
+    <h2 class="layout-h2 my-5">Reading Room Layout</h2>
+
+    <div class="room">
+        {% for cell_value in range(1, 145) %}
+            {% if cell_value in cell_values %}
+                {% for box in boxes %}
+                    {% if box.cell_value==cell_value %}
+                        {% if box.regno==None %}
+                            <div class="cell box-empty">{{ box.box_no }}</div>
+                        {% else %}
+                            {% if box.regno==student.regno %}
+                            <div class="cell box-assigned">{{ box.box_no }}</div>
+                            {% else %}
+                            <div class="cell box-filled">{{ box.box_no }}</div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% elif cell_value in [97, 98, 99, 100, 109, 110, 111, 112, 121, 122, 123, 124, 133, 134, 135, 136] %}
+                <div class="cell box-entrance"></div>
+            {% else %}
+                <div class="cell box-path"></div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-box" style="background:#22c55e"></div> Empty
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background:#ef4444"></div> Filled
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background:#3b82f6"></div> Your Box
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background:#fb9a24"></div> Admin Room
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="border:1px dashed #64748b"></div> Path
+        </div>
+    </div>
+
 </div>
 {% endblock %}

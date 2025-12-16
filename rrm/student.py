@@ -46,7 +46,10 @@ def home():
     non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
     total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
     total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
-    return render_template('student/home.html', student=g.user, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
+    # another value name cell_value which equals 12*(y_coordinate-1)+x_coordinate
+    boxes = query_all('SELECT box_no, is_laptop, regno, (12 * (y_coordinate - 1) + x_coordinate) AS cell_value FROM boxes ORDER BY cell_value ASC')
+    cell_values = [box['cell_value'] for box in boxes]
+    return render_template('student/home.html', student=g.user, boxes=boxes, cell_values=cell_values, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
 
 
 @bp.route('/register', methods=('GET', 'POST'))

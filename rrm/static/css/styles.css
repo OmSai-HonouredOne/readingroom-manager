@@ -135,3 +135,84 @@ body {
     color: #60a5fa;
     font-size: 18px;
 }
+
+
+/* Layout */
+.layout-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 30px auto;
+    /* make it centre aligned */
+    display: block;
+    text-align: center;
+}
+
+.layout-h2 {
+    color: #60a5fa;
+    margin-bottom: 20px;
+}
+
+.room {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+}
+
+.cell {
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    user-select: none;
+}
+
+.box-path {
+    background: transparent;
+}
+
+.box-empty {
+    background: #22c55e;
+    cursor: pointer;
+}
+
+.box-filled {
+    background: #ef4444;
+}
+
+.box-assigned {
+    background: #3b82f6;
+}
+
+.box-entrance {
+    background: #fb9a24;
+}
+
+.box-empty:hover {
+    outline: 2px solid #a7f3d0;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.legend-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+}
