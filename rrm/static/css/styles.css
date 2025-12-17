@@ -152,6 +152,7 @@ body {
         padding: 4%;
     }
 }
+
 .layout-h2 {
     color: #60a5fa;
     margin-bottom: 20px;
@@ -175,6 +176,7 @@ body {
     font-weight: bold;
     color: white;
     user-select: none;
+    position: relative;
 }
 
 .box-path {
@@ -200,6 +202,54 @@ body {
 
 .box-empty:hover {
     outline: 2px solid #a7f3d0;
+}
+
+.box-filled:hover{
+    outline: 2px solid #fca5a5;
+}
+
+
+/* POPUP */
+.seat-popup {
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #11131a;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    padding: 8px;
+    width: 160px;
+    font-size: 12px;
+    display: none;
+    z-index: 10;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+.seat-popup::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #11131a transparent transparent transparent;
+}
+
+.seat-popup button {
+    margin-top: 6px;
+    background: #2563eb;
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.seat-popup button:hover {
+    background: #1d4ed8;
 }
 
 .legend {

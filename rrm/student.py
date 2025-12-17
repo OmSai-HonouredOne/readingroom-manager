@@ -152,6 +152,31 @@ def toggle_laptop(regno):
     return redirect(url_for('student.profile'))
 
 
+@bp.route('/set_preference/<int:box_no>/<int:regno>', methods=('POST',))
+@login_required
+def set_preference(box_no, regno):
+    if g.user['regno'] != regno:
+        flash("You are not authorized to set preference for this profile.", 'danger')
+        return redirect(url_for('student.home'))
+
+    box = query_one('SELECT * FROM boxes WHERE box_no = %s', (box_no,))
+    if box is None:
+        flash("Invalid box number.", 'danger')
+        return redirect(url_for('student.home'))
+
+    if box['regno'] is not None:
+        flash("This box is already assigned to another student.", 'danger')
+        return redirect(url_for('student.home'))
+
+    execute(
+        'UPDATE students SET preferred_box = %s WHERE regno = %s',
+        (box_no, regno)
+    )
+
+    flash("Box preference set successfully.", 'success')
+    return redirect(url_for('student.profile'))
+
+
 @bp.route('/edit/<int:regno>', methods=('GET', 'POST'))
 @login_required
 def editprofile(regno):
