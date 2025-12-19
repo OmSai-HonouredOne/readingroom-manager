@@ -18,7 +18,9 @@ def dashboard():
     non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
     total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
     total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
-    return render_template('admin/dashboard.html', current_date=datetime.now().date(), laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
+    boxes = query_all('SELECT box_no, is_laptop, regno, name, (12 * (y_coordinate - 1) + x_coordinate) AS cell_value FROM boxes ORDER BY cell_value ASC')
+    cell_values = [box['cell_value'] for box in boxes]
+    return render_template('admin/dashboard.html', current_date=datetime.now().date(), laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop, boxes=boxes, cell_values=cell_values)
 
 
 
@@ -26,6 +28,7 @@ def dashboard():
 @admin_required
 def checkin():
     regno = request.form.get("regno") or request.form.get("manual_regno")
+    preferred_box = request.form.get("preferred_box")
     n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
     total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
     student = query_one('SELECT * FROM students WHERE regno = %s', (regno,))
@@ -54,6 +57,17 @@ def checkin():
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                         (student['regno'], student['name'], student['branch'], box['box_no']))
                 flash(f'Student {student["name"]} checked into preferred box {box["box_no"]} successfully.', 'success')
+                return redirect(url_for('admin.dashboard'))
+        elif preferred_box:
+            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (preferred_box,))
+            if box is None:
+                flash(f'Selected box {preferred_box} is not available. Assigning a different box.', 'warning')
+            else:
+                execute('UPDATE students SET is_checkedin = TRUE, box_no = %s WHERE regno = %s', (box['box_no'], regno))
+                execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+                execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
+                        (student['regno'], student['name'], student['branch'], box['box_no']))
+                flash(f'Student {student["name"]} checked into box {box["box_no"]} successfully.', 'success')
                 return redirect(url_for('admin.dashboard'))
         elif student['is_laptop']:
             box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL ORDER BY box_no ASC')

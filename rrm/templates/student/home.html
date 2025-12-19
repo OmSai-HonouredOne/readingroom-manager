@@ -1,23 +1,8 @@
 {% extends 'student/base.html' %}
 {% block title %}Student Home{% endblock %}
 {% block content %}
-<div class="container my-4">
-    <div class="row g-4">
-        <div class="col-12 col-md-6">
-            <div class="card p-4 text-center">
-                <h2>Laptop Seats: {{ laptop_occupied }}/{{ total_laptop }} <br>Non-Laptop Seats: {{ non_laptop_occupied}}/{{ total_non_laptop }}</h2>
-                {% if student.is_admin %}
-                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-blue mt-3">See More</a>
-                {% else %}
-                <a href="{{ url_for('student.profile') }}" class="btn btn-blue mt-3">See More</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="layout-container">
-    <h2 class="layout-h2 my-5">Reading Room Layout</h2>
+    <h2 class="layout-h2 my-5">L: {{ laptop_occupied }}/{{ total_laptop }} | NL: {{ non_laptop_occupied }}/{{ total_non_laptop }}</h2>
 
     <div class="room">
         {% for cell_value in range(1, 145) %}
