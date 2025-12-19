@@ -99,11 +99,3 @@ def entries(date):
     next_date = entry_date + timedelta(days=1)
     entries = query_all("SELECT session_id, regno, box_no, name, branch, to_char(in_time, 'HH12:MI AM') AS in_time_formatted, to_char(out_time, 'HH12:MI AM') AS out_time_formatted FROM entries WHERE in_time::date = %s ORDER BY in_time DESC", (entry_date,))
     return render_template('admin/entries.html', current_date=datetime.now().date(), entries=entries, entry_date=entry_date, previous_date=previous_date, next_date=next_date)
-
-
-@bp.route('/box-control')
-@admin_required
-def box_control():
-    boxes = query_all('SELECT box_no, is_laptop, regno, name, (12 * (y_coordinate - 1) + x_coordinate) AS cell_value FROM boxes ORDER BY cell_value ASC')
-    cell_values = [box['cell_value'] for box in boxes]
-    return render_template('admin/boxcontrol.html', boxes=boxes, cell_values=cell_values)
