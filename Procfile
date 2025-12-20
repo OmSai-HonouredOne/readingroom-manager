@@ -1,1 +1,1 @@
-web: gunicorn 'rrm:create_app()'
+web: gunicorn "rrm:create_app()" --workers 1 --threads 2 --timeout 120
