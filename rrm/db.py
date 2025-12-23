@@ -1,64 +1,50 @@
 import psycopg2, psycopg2.extras
-from datetime import datetime
-
-import click
+from psycopg2 import pool
 from flask import current_app, g
+
+db_pool = None
+
+def init_db_pool(app):
+    global db_pool
+    db_pool = psycopg2.pool.SimpleConnectionPool(
+        minconn=1,
+        maxconn=10,
+        dsn=app.config['DATABASE_URL'],
+        sslmode='require',
+        cursor_factory=psycopg2.extras.DictCursor
+    )
 
 def get_db():
     if 'db' not in g:
-        g.db = psycopg2.connect(
-            current_app.config['DATABASE_URL'],
-            sslmode='require',
-            cursor_factory=psycopg2.extras.DictCursor
-        )
+        g.db = db_pool.getconn()
     return g.db
 
+def release_db():
+    db = g.pop('db', None)
+    if db is not None:
+        db_pool.putconn(db)
 
 def query_one(sql, params=None):
     db = get_db()
-    cur = db.cursor()
-    cur.execute(sql, params)
-    result = cur.fetchone()
-    cur.close()
-    return result
-
+    with db.cursor() as cur:
+        cur.execute(sql, params)
+        return cur.fetchone()
 
 def query_all(sql, params=None):
     db = get_db()
-    cur = db.cursor()
-    cur.execute(sql, params)
-    result = cur.fetchall()
-    cur.close()
-    return result
-
+    with db.cursor() as cur:
+        cur.execute(sql, params)
+        return cur.fetchall()
 
 def execute(sql, params=None):
     db = get_db()
-    cur = db.cursor()
-    cur.execute(sql, params)
+    with db.cursor() as cur:
+        cur.execute(sql, params)
     db.commit()
-    cur.close()
-
 
 def close_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
-
-
-@click.command('init-db')
-def init_db_command():
-    try:
-        db = psycopg2.connect(
-            current_app.config['DATABASE_URL'],
-            sslmode='require'
-        )
-        db.close()
-        click.echo('Database connection successful.')
-    except Exception as e:
-        click.echo(f'Error connecting to the database: {e}')
+    release_db()
 
 def init_app(app):
+    init_db_pool(app)           # initialize the pool once
     app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
