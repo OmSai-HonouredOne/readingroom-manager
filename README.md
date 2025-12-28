@@ -5,7 +5,12 @@ A Production-grade web system to manage reading room occupancy, authentication, 
 ## Live Demo
 🔗 https://readingroom-ppbn.onrender.com/
 
+## Reading Room – Real-World System Demo/Walkthrough
+This video demonstrates the Reading Room system in real use, including user interaction, authentication, and administrative workflows that require multiple devices and therefore cannot be fully shown through screenshots alone.
 
+The focus of this video is not UI polish, but system behavior, logic flow, and how different components interact in practice.
+
+🔗 https://youtu.be/6nVfKZjPE2o?si=3VF_U95fCDKJiSFq
 
 ## Problem
 
