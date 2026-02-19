@@ -1,14 +1,12 @@
 # Reading Room QR/Bar Code Check-in System
 
-A Production-grade web system to manage reading room occupancy, authentication, check-in/check-out, and automatic seat allotment. Built to solve a real institutional problem. Designed for efficiency, not demos.
+A Production-grade web system to manage reading room occupancy, authentication, check-in/check-out, and automatic seat allotment.
 
 ## Live Demo
 🔗 https://readingroom-ppbn.onrender.com/
 
 ## Reading Room – Real-World System Demo/Walkthrough
 This video demonstrates the Reading Room system in real use, including user interaction, authentication, and administrative workflows that require multiple devices and therefore cannot be fully shown through screenshots alone.
-
-The focus of this video is not UI polish, but system behavior, logic flow, and how different components interact in practice.
 
 🔗 https://youtu.be/6nVfKZjPE2o?si=3VF_U95fCDKJiSFq
 
@@ -52,7 +50,6 @@ The system needed to be:
 - Maximizes resource efficiency and prevents misuse
 
 ### Graphical Reading Room Layout & Seat Selection (Version 3)
-
 - Full reading room visualized using CSS Grid
 - Irregular U-shaped layout modeled using transparent pathway cells
 - Color-coded seat states:
@@ -63,6 +60,16 @@ The system needed to be:
 - Clickable seats with contextual popups
 - Students can visually inspect availability and select preferred seats
 - Admin view allows interaction with occupied seats (e.g., forced checkout)
+
+### In-Memory Vectorized Layout Engine using Numpy (Version 4)
+- Replaced heavy database-driven seat rendering with an in-memory NumPy layout engine
+- Reading room modeled as a multi-dimensional NumPy array:
+  - Spatial dimensions represent room layout
+  - Structured fields store seat metadata (box number, occupancy, user ID)
+- Layout initialized from DB on server start with fallback recovery
+- Architecture designed for:
+  - Single-worker stability (current)
+  - Future horizontal scaling (Redis / multi-worker ready)
 
 ### Entry Records & Analytics
 - Complete log of:
@@ -79,7 +86,7 @@ The system needed to be:
 
 ## Tech Stack
 
-- Backend: Flask (Python)
+- Backend: Flask & Numpy (Python)
 - Database: Supabase (PostgreSQL)
 - Frontend: HTML, CSS, Bootstrap, JavaScript
 - Authentication: Session-based(server-side)
@@ -97,37 +104,13 @@ The system needed to be:
 
 This project was developed iteratively, with each version solving newly observed constraints.
 
-### Version 1 — Core System (~13 hours)
-
-- Authentication and role-based access
-- QR / barcode check-in and check-out
-- Manual fallback handling
-- Admin dashboard
-- Persistent session logging
-Focus: Correctness, security, and real-world usability
-
-### Version 2 — Automatic Seat Allotment (+2 hours)
-
-- Laptop vs non-laptop seat classification
-- Priority-based seat assignment algorithm
-- Misuse prevention and optimization logic
-Focus: System efficiency and resource optimization
-
-### Version 3 — Visual Layout & User Choice (+4 hours)
-
-- CSS Grid-based reading room layout
-- Irregular shaped layout made using transparent pathway cells
-- Seat-level interaction with popups
-- User-driven seat preference selection
-- Admin-side interaction with occupied seats
-Focus: Human-computer interaction and spatial reasoning
-
 ### Total Development Time
 
 - Version 1: ~13 hours
 - Version 2: ~2 hours
 - Version 3: ~4 hours
-- Total: ~19 hours
+- Version 4: ~3.5 hours
+- Total: ~22.5 hours
 Planned, implemented, tested, and deployed solo.
 
 ## Installation and Usage
