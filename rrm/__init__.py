@@ -21,10 +21,15 @@ def create_app(test_config=None):
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
-    
 
     from . import db
     db.init_app(app)
+
+    # initialize layout
+    from .db import query_all
+    from .layout import init_layout, layoutnp
+    with app.app_context():
+        init_layout(query_all)
 
     from . import student
     app.register_blueprint(student.bp)

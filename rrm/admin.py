@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from rrm.student import login_required, admin_required
 from rrm.db import query_all, query_one, execute
+from .layout import layoutnp
 
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -14,13 +15,7 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('/')
 @admin_required
 def dashboard():
-    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
-    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
-    total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
-    total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
-    boxes = query_all('SELECT box_no, is_laptop, regno, name, (12 * (y_coordinate - 1) + x_coordinate) AS cell_value FROM boxes ORDER BY cell_value ASC')
-    cell_values = [box['cell_value'] for box in boxes]
-    return render_template('admin/dashboard.html', current_date=datetime.now().date(), laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop, boxes=boxes, cell_values=cell_values)
+    return render_template('admin/dashboard.html', layoutnp=layoutnp, current_date=datetime.now().date())
 
 
 
@@ -29,60 +24,92 @@ def dashboard():
 def checkin():
     regno = request.form.get("regno") or request.form.get("manual_regno")
     preferred_box = request.form.get("preferred_box")
-    n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
-    total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
+    
+    # if None type then no conversion
+    if preferred_box:
+        preferred_box=int(preferred_box)
+    if regno:
+        regno=int(regno)
+
+
+    # n_occupied = query_one('SELECT COUNT(*) AS count FROM students WHERE is_checkedin = TRUE')
+    n_occupied = layoutnp[layoutnp['regno']>1].size
+    # total = query_one('SELECT COUNT(*) AS count FROM boxes')['count']
+    total = layoutnp[layoutnp['regno']>0].size
     student = query_one('SELECT * FROM students WHERE regno = %s', (regno,))
 
+    # if account doesnt exist or invalid registration number
     if student is None:
         flash(f'Student with registration number {regno} does not exist.', 'danger')
     
-    elif student['is_checkedin']:
-        execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (regno,))
-        execute('UPDATE boxes SET regno=NULL, name=NULL WHERE regno = %s', (regno,))
+    # in checked in, then check out
+    elif student['box_no']:
+        print(student)
+        # execute('UPDATE boxes SET regno=NULL, name=NULL WHERE regno = %s', (regno,))
+        layoutnp['regno'][layoutnp['regno']==regno] = 1
+        execute('UPDATE students SET box_no=NULL WHERE regno = %s', (regno,))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL",
                 (student['regno'],))
         flash(f'Student {student["name"]} checked out successfully.', 'success')
     
-    elif n_occupied['count'] >= total:
+    elif n_occupied >= total:
         flash('No rooms available for check-in.', 'danger')
     
     else:
+        # If student has a preference of seats
         if student['preferred_box']:
-            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (student['preferred_box'],))
-            if box is None:
+            # box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (student['preferred_box'],))
+            box = layoutnp['box_no'][(layoutnp['regno']==1) & (layoutnp['box_no']==student['preferred_box'])]
+            if box.size==0:
                 flash(f'Preferred box {student["preferred_box"]} is not available. Assigning a different box.', 'warning')
             else:
-                execute('UPDATE students SET is_checkedin = TRUE, box_no = %s, preferred_box = NULL WHERE regno = %s', (box['box_no'], regno))
-                execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+                # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+                layoutnp['regno'][layoutnp['box_no']==box] = regno
+                execute('UPDATE students SET box_no = %s, preferred_box = NULL WHERE regno = %s', (int(box[0]), regno))
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
-                        (student['regno'], student['name'], student['branch'], box['box_no']))
-                flash(f'Student {student["name"]} checked into preferred box {box["box_no"]} successfully.', 'success')
+                        (student['regno'], student['name'], student['branch'], int(box[0])))
+                flash(f'Student {student["name"]} checked into preferred box {box[0]} successfully.', 'success')
                 return redirect(url_for('admin.dashboard'))
+        
+        # If checked in through admin
         elif preferred_box:
-            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (preferred_box,))
-            if box is None:
+            # box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (preferred_box,))
+            box = layoutnp['box_no'][(layoutnp['box_no']==preferred_box) & (layoutnp['regno']==1)]
+            print(box, preferred_box, layoutnp['box_no'][(layoutnp['box_no']==7) & (layoutnp['regno']==1)], type(preferred_box), sep='\n')
+            if box.size==0:
                 flash(f'Selected box {preferred_box} is not available. Assigning a different box.', 'warning')
             else:
-                execute('UPDATE students SET is_checkedin = TRUE, box_no = %s WHERE regno = %s', (box['box_no'], regno))
-                execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+                # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+                layoutnp['regno'][layoutnp['box_no']==box] = regno
+                print(layoutnp['regno'])
+                execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
-                        (student['regno'], student['name'], student['branch'], box['box_no']))
-                flash(f'Student {student["name"]} checked into box {box["box_no"]} successfully.', 'success')
+                        (student['regno'], student['name'], student['branch'], int(box[0])))
+                flash(f'Student {student["name"]} checked into box {box[0]} successfully.', 'success')
                 return redirect(url_for('admin.dashboard'))
+            
+        # if student has is_laptop toggled on
         elif student['is_laptop']:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL ORDER BY box_no ASC')
-            if box is None:
-                box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
-        else:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno IS NULL ORDER BY box_no ASC')
-            if box is None:
-                box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
+            # box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL ORDER BY box_no ASC')
+            box = layoutnp['box_no'][(layoutnp['is_laptop']==True) & (layoutnp['regno']==1)]
+            if box.size==0:
+                # box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
+                box = layoutnp['box_no'][layoutnp['regno']==1]
         
-        execute('UPDATE students SET is_checkedin = TRUE, box_no = %s WHERE regno = %s', (box['box_no'], regno))
-        execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+        # if student has is_laptop toggled off
+        else:
+            # box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno IS NULL ORDER BY box_no ASC')
+            box = layoutnp['box_no'][(layoutnp['is_laptop']==False) & (layoutnp['regno']==1)]
+            if box.size==0:
+                # box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
+                box = layoutnp['box_no'][layoutnp['regno']==1]
+        
+        # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
+        layoutnp['regno'][layoutnp['box_no']==box] = regno
+        execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
         execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
-                (student['regno'], student['name'], student['branch'], box['box_no']))
-        flash(f'Student {student["name"]} checked into box {box["box_no"]} successfully.', 'success')
+                (student['regno'], student['name'], student['branch'], int(box[0])))
+        flash(f'Student {student["name"]} checked into box {box[0]} successfully.', 'success')
     
     return redirect(url_for('admin.dashboard'))
 

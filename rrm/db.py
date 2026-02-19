@@ -1,6 +1,6 @@
 import psycopg2, psycopg2.extras
 from psycopg2 import pool
-from flask import current_app, g
+from flask import g
 
 db_pool = None
 
