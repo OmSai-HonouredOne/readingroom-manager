@@ -154,10 +154,8 @@ The system supports two primary user roles **Student** and **Administrator**.
 5. Access historical usage records
 
 ## Future Scope
-
-- Admin-configurable seat rules
 - Multi-room support
-- Improved mobile responsiveness
+- Multi worker supporting architecture
 - Advanced analytics dashboards
 
 ## Contributing
