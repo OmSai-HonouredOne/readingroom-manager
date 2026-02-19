@@ -105,7 +105,7 @@ def checkin():
                 box = layoutnp['box_no'][layoutnp['regno']==1]
         
         # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
-        layoutnp['regno'][layoutnp['box_no']==box] = regno
+        layoutnp['regno'][layoutnp['box_no']==box[0]] = regno
         execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
         execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                 (student['regno'], student['name'], student['branch'], int(box[0])))

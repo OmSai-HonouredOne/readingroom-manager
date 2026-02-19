@@ -119,11 +119,7 @@ def logout():
 @bp.route('/profile')
 @login_required
 def profile():
-    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
-    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
-    total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
-    total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
-    return render_template('student/profile.html', student=g.user, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
+    return render_template('student/profile.html', student=g.user)
 
 
 @bp.route('/profile/<int:regno>/toggle_laptop')
@@ -152,12 +148,13 @@ def set_preference(box_no, regno):
         flash("You are not authorized to set preference for this profile.", 'danger')
         return redirect(url_for('student.home'))
 
-    box = query_one('SELECT * FROM boxes WHERE box_no = %s', (box_no,))
-    if box is None:
+    # box = query_one('SELECT * FROM boxes WHERE box_no = %s', (box_no,))
+    box = layoutnp[layoutnp['box_no']==box_no]
+    if box.size==0:
         flash("Invalid box number.", 'danger')
         return redirect(url_for('student.home'))
 
-    if box['regno'] is not None:
+    if box['regno']!=1:
         flash("This box is already assigned to another student.", 'danger')
         return redirect(url_for('student.home'))
 
