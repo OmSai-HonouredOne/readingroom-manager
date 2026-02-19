@@ -1,88 +1,97 @@
 # Reading Room QR/Bar Code Check-in System
 
-A Production-grade web system to manage reading room occupancy, authentication, check-in/check-out, and automatic seat allotment.
+A production-grade web system for managing reading room occupancy, authentication, check-in/check-out, and automatic seat allotment.
 
 ## Live Demo
 🔗 https://readingroom-ppbn.onrender.com/
 
-## Reading Room – Real-World System Demo/Walkthrough
-This video demonstrates the Reading Room system in real use, including user interaction, authentication, and administrative workflows that require multiple devices and therefore cannot be fully shown through screenshots alone.
+## Real-World System Walkthrough
+A live demo showcasing real usage across multiple devices, including authentication, seat allocation, and admin workflows.
 
 🔗 https://youtu.be/6nVfKZjPE2o?si=3VF_U95fCDKJiSFq
 
+---
+
 ## Problem
 
-The reading room faced multiple operational issues:
-- No real-time occupancy tracking(students walked long distances just to check availability)
+The reading room faced multiple operational challenges:
+- No real-time seat availability
 - Manual and inefficient check-in/check-out
-- No way to prevent misuse of seats (laptop vs non-laptop)
-- No spatial visibility of available seats
+- Seat misuse (laptop vs non-laptop)
+- No spatial visibility of occupancy
 
-The system needed to be:
-- Secure
-- Efficient usage of seats
-- Admin-controlled
-- Scalable for real-world usage
+The system needed to be **secure**, **efficient**, **admin-controlled**, and **scalable**.
+
+---
 
 ## Features
 
 ### Authentication & Roles
-- Secure authentication system
+- Secure session-based authentication
 - Role-based access (Admin / Student)
-- Admin-only check-in and check-out to prevent misuse
+- Admin-controlled check-in/check-out to prevent misuse
 
 ### Check-In / Check-Out (3 Methods)
-- University ID card barcode
-- Unique QR code assigned to each user
+- University ID barcode
+- User-specific QR code
 - Manual registration number entry (fallback)
 
-### Real-Time Reading Room Status
-- Live occupancy tracking
-- View whether the reading room is occupied or empty
-- Live tracking of active sessions for administrators
+### Real-Time Occupancy
+- Live reading room status
+- Active session monitoring for administrators
 
-### Automatic Seat (Box) Allotment (Version 2)
-- Two seat types: Normal & Laptop (with plug points)
-- Users specify laptop status in profile
-- System assigns seats automatically using priority logic:
-  - First preference: matching seat type
-  - Second preference: fallback if preferred seats are unavailable
-- Maximizes resource efficiency and prevents misuse
+### Automatic Seat Allotment (Version 2)
+- Two seat types: Normal & Laptop
+- User-defined laptop preference
+- Priority-based assignment:
+  - Matching seat type
+  - Intelligent fallback if unavailable
 
-### Graphical Reading Room Layout & Seat Selection (Version 3)
-- Full reading room visualized using CSS Grid
-- Irregular U-shaped layout modeled using transparent pathway cells
+### Graphical Seat Layout (Version 3)
+- Full reading room rendered using CSS Grid
+- Irregular U-shaped layout with transparent walkways
 - Color-coded seat states:
-  - 🟩 Green — Available
-  - 🟥 Red — Occupied
-  - 🟦 Blue — Assigned to current user
-  - ⬜ Transparent — Walkways
-- Clickable seats with contextual popups
-- Students can visually inspect availability and select preferred seats
-- Admin view allows interaction with occupied seats (e.g., forced checkout)
+  - 🟩 Available
+  - 🟥 Occupied
+  - 🟦 Assigned (current user)
+- Clickable seats with contextual actions
+- Admin controls for occupied seats
 
-### In-Memory Vectorized Layout Engine using Numpy (Version 4)
-- Replaced heavy database-driven seat rendering with an in-memory NumPy layout engine
-- Reading room modeled as a multi-dimensional NumPy array:
-  - Spatial dimensions represent room layout
-  - Structured fields store seat metadata (box number, occupancy, user ID)
-- Layout initialized from DB on server start with fallback recovery
-- Architecture designed for:
-  - Single-worker stability (current)
-  - Future horizontal scaling (Redis / multi-worker ready)
+### In-Memory Vectorized Layout Engine (Version 4)
+- Migrated seat state handling from DB to in-memory NumPy arrays
+- Multi-dimensional layout with structured seat metadata
+- Vectorized operations for state updates
+- Layout initialized from DB with fallback recovery
+- ~70% reduction in runtime SQL queries
+- Near-instant rendering on Render free tier
+- Designed for single-worker stability and future horizontal scaling
 
-### Entry Records & Analytics
-- Complete log of:
-  - Session ID
+#### 🧠 Architecture Philosophy
+This system is designed around **data shape and access patterns**, not tool categories.
+
+The reading room is a spatial state problem:
+- fixed-size grids
+- frequent reads
+- localized writes
+- deterministic transitions
+
+An in-memory, vectorized model minimizes IO latency, eliminates redundant queries, and treats the layout as a single coherent state object.  
+Tools are chosen based on **problem fit**, not convention.
+
+---
+
+### Records & Analytics
+- Complete session logs:
   - Student details
-  - Check-in and check-out timestamps
-  - Box number, which the student occupied
-- Date-wise pagination for organized review and scalability
+  - Check-in / check-out timestamps
+  - Assigned seat (box number)
+- Date-wise pagination for scalability
 
 ### Security & Production Practices
-- Environment variables used for sensitive data
-- No credentials exposed in repository
+- Environment variables for sensitive data
+- No credentials committed
 - Flash messaging for user feedback
+
 
 ## Tech Stack
 
