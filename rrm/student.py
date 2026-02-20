@@ -44,6 +44,10 @@ def admin_required(view):
 def home():
     return render_template('student/home.html', student=g.user, layoutnp=layoutnp)
 
+@bp.route('/justtokeepdbactive')
+def jtka():
+    jtkal = queryone("SELECT * from users WHERE regno=12345678")
+    return str(jtkal)
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
