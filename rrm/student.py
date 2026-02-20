@@ -46,7 +46,7 @@ def home():
 
 @bp.route('/justtokeepdbactive')
 def jtka():
-    jtkal = queryone("SELECT * from users WHERE regno=12345678")
+    jtkal = query_one("SELECT * from users WHERE regno=12345678")
     return str(jtkal)
 
 @bp.route('/register', methods=('GET', 'POST'))
