@@ -9,7 +9,7 @@
             <p><label>Registration Number:</label> {{ student.regno }}</p>
             <p><label>Branch:</label> {{ student.branch }}</p>
             <p><label>Laptop:</label> {% if student.is_laptop %}Yes{% else %}No{% endif %}</p>
-            {% if student.is_checkedin %}
+            {% if student.box_no %}
             <p><label>Status:</label> Checked In ✅(Box Number: {{ student.box_no }})</p>
             {% else %}
             <p><label>Status:</label> Not Checked In ❌</p>
