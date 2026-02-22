@@ -44,10 +44,6 @@ def admin_required(view):
 def home():
     return render_template('student/home.html', student=g.user, layoutnp=layoutnp)
 
-@bp.route('/justtokeepdbactive')
-def jtka():
-    jtkal = query_one("SELECT regno from students WHERE regno=12345678")
-    return f"{jtkal} 2467"
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
@@ -94,7 +90,6 @@ def login():
             password = request.form['password']
             error = None
             user = query_one('SELECT regno, password, is_admin FROM students WHERE regno = %s', (regno,))
-            print(user)
 
             if user is None:
                 error = 'Incorrect registration number.'
