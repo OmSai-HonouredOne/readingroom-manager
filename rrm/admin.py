@@ -14,8 +14,8 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @bp.route('/')
 @admin_required
 def dashboard():
-    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno IS NOT NULL')['count']
-    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno IS NOT NULL')['count']
+    laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE AND regno!=1')['count']
+    non_laptop_occupied = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE AND regno!=1')['count']
     total_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = TRUE')['count']
     total_non_laptop = query_one('SELECT COUNT(*) AS count FROM boxes WHERE is_laptop = FALSE')['count']
     boxes = query_all('SELECT box_no, is_laptop, regno, name, (12 * (y_coordinate - 1) + x_coordinate) AS cell_value FROM boxes ORDER BY cell_value ASC')
@@ -38,7 +38,7 @@ def checkin():
     
     elif student['is_checkedin']:
         execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (regno,))
-        execute('UPDATE boxes SET regno=NULL, name=NULL WHERE regno = %s', (regno,))
+        execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (regno,))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL",
                 (student['regno'],))
         flash(f'Student {student["name"]} checked out successfully.', 'success')
@@ -48,7 +48,7 @@ def checkin():
     
     else:
         if student['preferred_box']:
-            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (student['preferred_box'],))
+            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno=1', (student['preferred_box'],))
             if box is None:
                 flash(f'Preferred box {student["preferred_box"]} is not available. Assigning a different box.', 'warning')
             else:
@@ -59,7 +59,7 @@ def checkin():
                 flash(f'Student {student["name"]} checked into preferred box {box["box_no"]} successfully.', 'success')
                 return redirect(url_for('admin.dashboard'))
         elif preferred_box:
-            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (preferred_box,))
+            box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno=1', (preferred_box,))
             if box is None:
                 flash(f'Selected box {preferred_box} is not available. Assigning a different box.', 'warning')
             else:
@@ -70,13 +70,13 @@ def checkin():
                 flash(f'Student {student["name"]} checked into box {box["box_no"]} successfully.', 'success')
                 return redirect(url_for('admin.dashboard'))
         elif student['is_laptop']:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno IS NULL ORDER BY box_no ASC')
+            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=TRUE AND regno=1 ORDER BY box_no ASC')
             if box is None:
-                box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
+                box = query_one('SELECT box_no FROM boxes WHERE regno=1')
         else:
-            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno IS NULL ORDER BY box_no ASC')
+            box = query_one('SELECT box_no FROM boxes WHERE is_laptop=FALSE AND regno=1 ORDER BY box_no ASC')
             if box is None:
-                box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
+                box = query_one('SELECT box_no FROM boxes WHERE regno=1')
         
         execute('UPDATE students SET is_checkedin = TRUE, box_no = %s WHERE regno = %s', (box['box_no'], regno))
         execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))

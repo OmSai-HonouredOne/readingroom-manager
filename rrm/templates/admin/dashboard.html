@@ -31,7 +31,7 @@
             {% if cell_value in cell_values %}
                 {% for box in boxes %}
                     {% if box.cell_value==cell_value %}
-                        {% if box.regno==None %}
+                        {% if box.regno==1 %}
                         <div class="cell box-empty" onclick="togglePopup(this, event)">
                             {{ box.box_no }}
                             <div class="seat-popup">
