@@ -133,6 +133,18 @@ def profile():
     return render_template('student/profile.html', student=g.user, laptop_occupied=laptop_occupied, non_laptop_occupied=non_laptop_occupied, total_laptop=total_laptop, total_non_laptop=total_non_laptop)
 
 
+@bp.route("/profile/checkout")
+@login_required
+def checkout():
+    if g.user['is_checkedin']:
+        execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (g.user['regno'],))
+        execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (g.user['regno'],))
+        execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL", (g.user['regno'],))
+        flash(f'Student {g.user["name"]} checked out successfully.', 'success')
+    else:
+        flash("User was never checked in")
+    return redirect(url_for('student.profile'))
+
 @bp.route('/profile/<int:regno>/toggle_laptop')
 @login_required
 def toggle_laptop(regno):
