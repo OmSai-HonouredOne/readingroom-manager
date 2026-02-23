@@ -171,8 +171,8 @@ def set_preference(box_no, regno):
         flash("You are not authorized to set preference for this profile.", 'danger')
         return redirect(url_for('student.home'))
 
-    box = query_one('SELECT * FROM boxes WHERE box_no = %s AND regno!=1', (box_no,))
-    if box is None:
+    box = query_one('SELECT * FROM boxes WHERE box_no = %s', (box_no,))
+    if box['regno']!=1:
         flash("Invalid box number or Already occupied.", 'danger')
         return redirect(url_for('student.home'))
 
