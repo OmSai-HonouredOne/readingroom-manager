@@ -62,7 +62,7 @@ The system needed to be **secure**, **efficient**, **admin-controlled**, and **s
 - Multi-dimensional layout with structured seat metadata
 - Vectorized operations for state updates
 - Layout initialized from DB with fallback recovery
-- ~70% reduction in runtime SQL queries
+- Much reduction in runtime SQL queries
 - Near-instant rendering on Render free tier
 - Designed for single-worker stability and future horizontal scaling
 
@@ -77,6 +77,11 @@ The reading room is a spatial state problem:
 
 An in-memory, vectorized model minimizes IO latency, eliminates redundant queries, and treats the layout as a single coherent state object.  
 Tools are chosen based on **problem fit**, not convention.
+
+### Seat availability Reminder(Version 5)
+- If all seats are occupied, users can set an email reminder for availability.
+- When a seat is freed within 20 minutes of checkout, the user is automatically notified via email.
+- Implemented using time comparison at checkout with minimal database changes and no background schedulers.
 
 ---
 
@@ -119,7 +124,8 @@ This project was developed iteratively, with each version solving newly observed
 - Version 2: ~2 hours
 - Version 3: ~4 hours
 - Version 4: ~3.5 hours
-- Total: ~22.5 hours
+- Version 5: ~1.5 hours
+- Total: ~24 hours
 Planned, implemented, tested, and deployed solo.
 
 ## Installation and Usage
@@ -132,7 +138,7 @@ cd readingroom-manager
 pip install -r requirements.txt
 ```
 
-Create a ```.env``` file in the repo folder and fill make environment variables:
+Create a ```.env``` file in the repo folder and fill the environment variables:
 ```bash
 FLASK_APP=rrbook
 SECRET_KEY="SUPERSECRETKEY"
@@ -180,4 +186,3 @@ Om Sai,
 Engineering Student passionate about building scalable, user-centric web applications and unique engineering projects.
 
 Github: https://github.com/OmSai-HonouredOne
-
