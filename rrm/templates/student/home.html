@@ -5,7 +5,11 @@
     <div class="room">
         {% for box in layoutnp %}
             {% if box["regno"]==1 %}
-            <div class="cell box-empty" onclick="togglePopup(this)">
+            {% if box["is_laptop"]==True %}
+            <div class="cell box-empty-laptop" onclick="togglePopup(this)">
+            {% else %}
+            <div class="cell box-empty-nlaptop" onclick="togglePopup(this)">
+            {% endif %}
                 {{ box["box_no"] }}
                 <div class="seat-popup">
                     {% if student %}
@@ -39,7 +43,10 @@
     <!-- LEGEND -->
     <div class="legend">
         <div class="legend-item">
-            <div class="legend-box" style="background:#22c55e"></div> Empty
+            <div class="legend-box" style="background:#22c55e"></div> Laptop Seat
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background:#199547"></div> Non-Laptop Seat
         </div>
         <div class="legend-item">
             <div class="legend-box" style="background:#ef4444"></div> Filled
