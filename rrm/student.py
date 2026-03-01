@@ -1,10 +1,11 @@
 import functools
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from rrm.db import query_all, query_one, execute
 from .layout import layoutnp
+from .reminder import sendReminder
 
 bp = Blueprint('student', __name__)
 
@@ -42,7 +43,7 @@ def admin_required(view):
 
 @bp.route('/')
 def home():
-    return render_template('student/home.html', student=g.user, layoutnp=layoutnp)
+    return render_template('student/home.html', student=g.user, layoutnp=layoutnp, seats_available=(layoutnp['regno']==1).sum())
 
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -120,6 +121,19 @@ def logout():
 def profile():
     return render_template('student/profile.html', student=g.user)
 
+@bp.route("/profile/checkout")
+@login_required
+def checkout():
+    if g.user['box_no'] is not None:
+        # execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (g.user['regno'],))
+        layoutnp['regno'][layoutnp['regno']==g.user['regno']] = 1
+        execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (g.user['regno'],))
+        execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL", (g.user['regno'],))
+        flash(f'Student {g.user["name"]} checked out successfully.', 'success')
+        sendReminder(query_all, execute, current_app)
+    else:
+        flash("User was never checked in")
+    return redirect(url_for('student.profile'))
 
 @bp.route('/profile/<int:regno>/toggle_laptop')
 @login_required
@@ -139,6 +153,12 @@ def toggle_laptop(regno):
     flash("Laptop status updated successfully.", 'success')
     return redirect(url_for('student.profile'))
 
+@bp.route('/profile/set-reminder')
+@login_required
+def set_reminder():
+    execute("UPDATE students SET set_reminder = TRUE, reminder_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s", (g.user['regno'],))
+    flash("Reminder set successfully. You will receive an email when a seat is available.", 'success')
+    return redirect(url_for('student.home'))
 
 @bp.route('/set_preference/<int:box_no>/<int:regno>', methods=('POST',))
 @login_required

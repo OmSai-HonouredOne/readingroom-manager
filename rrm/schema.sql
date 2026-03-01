@@ -2,14 +2,15 @@
 -- Table order and constraints may not be valid for execution.
 
 CREATE TABLE public.boxes (
-  box_no bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  box_no integer NOT NULL,
   is_laptop boolean NOT NULL DEFAULT false,
-  regno bigint,
+  regno bigint NOT NULL DEFAULT '1'::bigint,
   name text,
   x_coordinate bigint,
   y_coordinate bigint,
-  CONSTRAINT boxes_pkey PRIMARY KEY (box_no),
-  CONSTRAINT boxes_regno_fkey FOREIGN KEY (regno) REFERENCES public.students(regno)
+  room_no smallint,
+  id integer NOT NULL,
+  CONSTRAINT boxes_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.entries (
   session_id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
@@ -33,5 +34,7 @@ CREATE TABLE public.students (
   box_no bigint,
   is_laptop boolean NOT NULL DEFAULT false,
   preferred_box bigint,
+  set_reminder boolean DEFAULT false,
+  reminder_time timestamp without time zone,
   CONSTRAINT students_pkey PRIMARY KEY (regno)
 );

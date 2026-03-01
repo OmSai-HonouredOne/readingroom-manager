@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, render_template, request, redirect, url_for, flash, g
+    Blueprint, render_template, request, redirect, url_for, flash, g, current_app
 )
 from werkzeug.exceptions import abort
 from datetime import datetime, timedelta
@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from rrm.student import login_required, admin_required
 from rrm.db import query_all, query_one, execute
 from .layout import layoutnp
+from .reminder import sendReminder
 
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -44,14 +45,14 @@ def checkin():
     
     # in checked in, then check out
     elif student['box_no']:
-        print(student)
         # execute('UPDATE boxes SET regno=NULL, name=NULL WHERE regno = %s', (regno,))
         layoutnp['regno'][layoutnp['regno']==regno] = 1
         execute('UPDATE students SET box_no=NULL WHERE regno = %s', (regno,))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL",
                 (student['regno'],))
+        
         flash(f'Student {student["name"]} checked out successfully.', 'success')
-    
+        sendReminder(query_all, execute, current_app)
     elif n_occupied >= total:
         flash('No rooms available for check-in.', 'danger')
     

@@ -28,7 +28,11 @@
     <div class="room">
         {% for box in layoutnp %}
             {% if box["regno"]==1 %}
-            <div class="cell box-empty" onclick="togglePopup(this, event)">
+            {% if box["is_laptop"]==True %}
+            <div class="cell box-empty-laptop" onclick="togglePopup(this, event)">
+            {% else %}
+            <div class="cell box-empty-nlaptop" onclick="togglePopup(this, event)">
+            {% endif %}
                 {{ box.box_no }}
                 <div class="seat-popup">
                     Enter Registration Number to Assign

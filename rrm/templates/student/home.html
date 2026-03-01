@@ -2,6 +2,12 @@
 {% block title %}Student Home{% endblock %}
 {% block content %}
 <div class="layout-container my-5">
+    <!-- button to set reminder -->
+    {% if seats_available==0 %}
+    <div class="mb-4">
+        <a href="{{ url_for('student.set_reminder') }}" class="btn btn-blue">Reminder</a>
+    </div>
+    {% endif %}
     <div class="room">
         {% for box in layoutnp %}
             {% if box["regno"]==1 %}
@@ -43,7 +49,7 @@
     <!-- LEGEND -->
     <div class="legend">
         <div class="legend-item">
-            <div class="legend-box" style="background:#22c55e"></div> Laptop Seat
+            <div class="legend-box" style="background:#2ae66f"></div> Laptop Seat
         </div>
         <div class="legend-item">
             <div class="legend-box" style="background:#199547"></div> Non-Laptop Seat
