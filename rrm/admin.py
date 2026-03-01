@@ -1,11 +1,12 @@
 from flask import (
-    Blueprint, render_template, request, redirect, url_for, flash, g
+    Blueprint, render_template, request, redirect, url_for, flash, g, current_app
 )
 from werkzeug.exceptions import abort
 from datetime import datetime, timedelta
 
 from rrm.student import login_required, admin_required
 from rrm.db import query_all, query_one, execute
+from .reminder import sendReminder
 
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -41,6 +42,7 @@ def checkin():
         execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (regno,))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL",
                 (student['regno'],))
+        sendReminder(query_all, execute, current_app)
         flash(f'Student {student["name"]} checked out successfully.', 'success')
     
     elif n_occupied['count'] >= total:

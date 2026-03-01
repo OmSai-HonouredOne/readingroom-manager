@@ -183,8 +183,8 @@ body {
     background: transparent;
 }
 
-.box-empty {
-    background: #22c55e;
+.box-empty-nlaptop {
+    background: #27d668;
     cursor: pointer;
 }
 
@@ -196,11 +196,14 @@ body {
     background: #3b82f6;
 }
 
-.box-entrance {
-    background: #fb9a24;
+.box-empty-laptop {
+    background: #199547;
 }
 
-.box-empty:hover {
+.box-empty-nlaptop:hover {
+    outline: 2px solid #a7f3d0;
+}
+.box-empty-laptop:hover{
     outline: 2px solid #a7f3d0;
 }
 

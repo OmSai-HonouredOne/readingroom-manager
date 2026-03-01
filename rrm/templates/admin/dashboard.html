@@ -32,7 +32,11 @@
                 {% for box in boxes %}
                     {% if box.cell_value==cell_value %}
                         {% if box.regno==1 %}
-                        <div class="cell box-empty" onclick="togglePopup(this, event)">
+                        {% if box["is_laptop"]==True %}
+                        <div class="cell box-empty-laptop" onclick="togglePopup(this, event)">
+                        {% else %}
+                        <div class="cell box-empty-nlaptop" onclick="togglePopup(this, event)">
+                        {% endif %}
                             {{ box.box_no }}
                             <div class="seat-popup">
                                 Enter Registration Number to Assign
@@ -57,8 +61,6 @@
                         {% endif %}
                     {% endif %}
                 {% endfor %}
-            {% elif cell_value in [97, 98, 99, 100, 109, 110, 111, 112, 121, 122, 123, 124, 133, 134, 135, 136] %}
-            <div class="cell box-entrance"></div>
             {% else %}
             <div class="cell box-path"></div>
             {% endif %}

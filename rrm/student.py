@@ -1,9 +1,10 @@
 import functools
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 from rrm.db import query_all, query_one, execute
+from .reminder import sendReminder
 
 
 bp = Blueprint('student', __name__)
@@ -141,6 +142,7 @@ def checkout():
         execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (g.user['regno'],))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL", (g.user['regno'],))
         flash(f'Student {g.user["name"]} checked out successfully.', 'success')
+        sendReminder(query_all, execute, current_app)
     else:
         flash("User was never checked in")
     return redirect(url_for('student.profile'))
@@ -163,6 +165,12 @@ def toggle_laptop(regno):
     flash("Laptop status updated successfully.", 'success')
     return redirect(url_for('student.profile'))
 
+@bp.route('/profile/set-reminder')
+@login_required
+def set_reminder():
+    execute("UPDATE students SET set_reminder = TRUE, reminder_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s", (g.user['regno'],))
+    flash("Reminder set successfully. You will receive an email when a seat is available.", 'success')
+    return redirect(url_for('student.home'))
 
 @bp.route('/set_preference/<int:box_no>/<int:regno>', methods=('POST',))
 @login_required
