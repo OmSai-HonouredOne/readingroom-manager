@@ -3,7 +3,7 @@ from .db import query_all, execute
 
 def sendReminder(query_all, execute, app):
     # bring the students with set_reminder = TRUE and reminder_time within the last 20 minutes
-    emails = query_all("SELECT email FROM students WHERE set_reminder = TRUE AND reminder_time >= NOW() AT TIME ZONE 'Asia/Kolkata' - INTERVAL '20 minutes'")
+    emails = query_all("SELECT email FROM students WHERE reminder_time!=NULL AND reminder_time >= NOW() AT TIME ZONE 'Asia/Kolkata' - INTERVAL '20 minutes'")
     # Set up the SMTP server
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
@@ -22,4 +22,4 @@ def sendReminder(query_all, execute, app):
         server.quit()
     except Exception as e:
         pass
-    execute('UPDATE students SET set_reminder = FALSE, reminder_time=NULL WHERE set_reminder = TRUE')
+    execute('UPDATE students SET reminder_time=NULL WHERE reminder_time!=NULL')

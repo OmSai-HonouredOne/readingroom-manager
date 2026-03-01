@@ -34,7 +34,6 @@ CREATE TABLE public.students (
   box_no bigint,
   is_laptop boolean NOT NULL DEFAULT false,
   preferred_box bigint,
-  set_reminder boolean DEFAULT false,
   reminder_time timestamp without time zone,
   CONSTRAINT students_pkey PRIMARY KEY (regno)
 );

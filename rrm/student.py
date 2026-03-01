@@ -156,7 +156,7 @@ def toggle_laptop(regno):
 @bp.route('/profile/set-reminder')
 @login_required
 def set_reminder():
-    execute("UPDATE students SET set_reminder = TRUE, reminder_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s", (g.user['regno'],))
+    execute("UPDATE students SET reminder_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s", (g.user['regno'],))
     flash("Reminder set successfully. You will receive an email when a seat is available.", 'success')
     return redirect(url_for('student.home'))
 
