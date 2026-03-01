@@ -130,7 +130,6 @@ def checkout():
         execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (g.user['regno'],))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL", (g.user['regno'],))
         flash(f'Student {g.user["name"]} checked out successfully.', 'success')
-        sendReminder(query_all, execute, current_app)
     else:
         flash("User was never checked in")
     return redirect(url_for('student.profile'))

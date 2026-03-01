@@ -52,7 +52,6 @@ def checkin():
                 (student['regno'],))
         
         flash(f'Student {student["name"]} checked out successfully.', 'success')
-        sendReminder(query_all, execute, current_app)
     elif n_occupied >= total:
         flash('No rooms available for check-in.', 'danger')
     
