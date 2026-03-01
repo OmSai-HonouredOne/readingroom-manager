@@ -76,13 +76,11 @@ def checkin():
         elif preferred_box:
             # box = query_one('SELECT box_no FROM boxes WHERE box_no = %s AND regno IS NULL', (preferred_box,))
             box = layoutnp['box_no'][(layoutnp['box_no']==preferred_box) & (layoutnp['regno']==1)]
-            print(box, preferred_box, layoutnp['box_no'][(layoutnp['box_no']==7) & (layoutnp['regno']==1)], type(preferred_box), sep='\n')
             if box.size==0:
                 flash(f'Selected box {preferred_box} is not available. Assigning a different box.', 'warning')
             else:
                 # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
                 layoutnp['regno'][layoutnp['box_no']==box] = regno
-                print(layoutnp['regno'])
                 execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                         (student['regno'], student['name'], student['branch'], int(box[0])))
