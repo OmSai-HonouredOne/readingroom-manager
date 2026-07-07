@@ -3,11 +3,6 @@
 {% block content %}
 <div class="layout-container my-5">
     <!-- button to set reminder -->
-    {% if seats_available==0 %}
-    <div class="mb-4">
-        <a href="{{ url_for('student.set_reminder') }}" class="btn btn-blue">Reminder</a>
-    </div>
-    {% endif %}
     <div class="room">
         {% for box in layoutnp %}
             {% if box["regno"]==1 %}
