@@ -2,8 +2,8 @@
 
 A production-grade web system for managing reading room occupancy, authentication, check-in/check-out, and automatic seat allotment.
 
-## Live Demo
-🔗 https://readingroom-ppbn.onrender.com/
+## Deployed On
+🔗 https://readingroom.outr.ac.in/
 
 ## Real-World System Walkthrough
 A live demo showcasing real usage across multiple devices, including authentication, seat allocation, and admin workflows.
