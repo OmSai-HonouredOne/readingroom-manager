@@ -45,8 +45,8 @@ def checkin():
     
     # in checked in, then check out
     elif student['box_no']:
-        # execute('UPDATE boxes SET regno=NULL, name=NULL WHERE regno = %s', (regno,))
         layoutnp['regno'][layoutnp['regno']==regno] = 1
+        execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (regno,))
         execute('UPDATE students SET box_no=NULL WHERE regno = %s', (regno,))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL",
                 (student['regno'],))
@@ -64,8 +64,8 @@ def checkin():
             if box.size==0:
                 flash(f'Preferred box {student["preferred_box"]} is not available. Assigning a different box.', 'warning')
             else:
-                # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
                 layoutnp['regno'][layoutnp['box_no']==box] = regno
+                execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], int(box[0])))
                 execute('UPDATE students SET box_no = %s, preferred_box = NULL WHERE regno = %s', (int(box[0]), regno))
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                         (student['regno'], student['name'], student['branch'], int(box[0])))
@@ -79,8 +79,8 @@ def checkin():
             if box.size==0:
                 flash(f'Selected box {preferred_box} is not available. Assigning a different box.', 'warning')
             else:
-                # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
                 layoutnp['regno'][layoutnp['box_no']==box] = regno
+                execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], int(box[0])))
                 execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
                 execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                         (student['regno'], student['name'], student['branch'], int(box[0])))
@@ -103,13 +103,14 @@ def checkin():
                 # box = query_one('SELECT box_no FROM boxes WHERE regno IS NULL')
                 box = layoutnp['box_no'][layoutnp['regno']==1]
         
-        # execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], box['box_no']))
         layoutnp['regno'][layoutnp['box_no']==box[0]] = regno
+        execute('UPDATE boxes SET regno = %s, name = %s WHERE box_no = %s', (regno, student['name'], int(box[0])))
         execute('UPDATE students SET box_no = %s WHERE regno = %s', (int(box[0]), regno))
         execute("INSERT INTO entries (regno, name, branch, box_no, in_time) VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'Asia/Kolkata')",
                 (student['regno'], student['name'], student['branch'], int(box[0])))
         flash(f'Student {student["name"]} checked into box {box[0]} successfully.', 'success')
     
+
     return redirect(url_for('admin.dashboard'))
 
 

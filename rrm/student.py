@@ -125,7 +125,7 @@ def profile():
 @login_required
 def checkout():
     if g.user['box_no'] is not None:
-        # execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (g.user['regno'],))
+        execute('UPDATE boxes SET regno=1, name=NULL WHERE regno = %s', (g.user['regno'],))
         layoutnp['regno'][layoutnp['regno']==g.user['regno']] = 1
         execute('UPDATE students SET is_checkedin=FALSE, box_no=NULL WHERE regno = %s', (g.user['regno'],))
         execute("UPDATE entries SET out_time = NOW() AT TIME ZONE 'Asia/Kolkata' WHERE regno = %s AND out_time IS NULL", (g.user['regno'],))

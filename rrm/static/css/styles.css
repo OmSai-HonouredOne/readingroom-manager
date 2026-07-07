@@ -275,3 +275,25 @@ body {
     height: 18px;
     border-radius: 4px;
 }
+
+
+/* Minimal Footer */
+.simple-footer {
+    max-width: 600px; /* Matches your layout-container width */
+    width: 100%;
+    margin: 60px auto 0 auto; /* Centered with top spacing */
+    text-align: center;
+    padding: 0 4% 40px 4%; /* 40px padding at the very bottom */
+}
+
+.footer-line {
+    border: 0;
+    border-top: 1px solid #1f2937; /* Subtle, clean divider */
+    margin-bottom: 20px;
+}
+
+.simple-footer p {
+    color: #616e7f; /* Muted gray-blue tone */
+    font-size: 13px;
+    margin: 0;
+}
